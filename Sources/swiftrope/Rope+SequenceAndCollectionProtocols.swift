@@ -1,21 +1,9 @@
-extension Rope: CustomStringConvertible {
-    var description: String {
-        func describeChildren<T>(_ node: RopeNode<T>?) -> String {
-            guard let head = node else { return "" }
-            let left = describeChildren(head.left)
-            let right = describeChildren(head.right)
-            return left + right
-        }
-        return describeChildren(head)
-    }
-}
-
 extension Rope: Collection {
     var startIndex: Int { return 0 }
     var endIndex: Int { return weight }
     
      func index(after i: Int) -> Int {
-        precondition(i < head?.weight ?? 0, "Index out of bounds")
+        precondition(i < self.weight, "Index out of bounds")
         return i + 1
     }
 }
@@ -31,15 +19,36 @@ extension Rope: BidirectionalCollection {
 extension Rope: MutableCollection {
     subscript(position: Int) -> Element {
         get {
-            precondition(head != nil, "Index out of bounds")
-            let (contentsIdx, nodeWithIdx) = head!.findNodeWithIndex(position)
-            precondition(nodeWithIdx?.contents != nil, "Index out of bounds")
-            return nodeWithIdx!.contents![contentsIdx]
+            switch self {
+            case .leaf(let contents): return contents[position]
+            case let .node(l, r):
+                if weight <= position {
+                    precondition(r != nil, "Index out of bounds")
+                    return r![position - weight]
+                } else {
+                    precondition(l != nil, "Index out of bounds")
+                    return l![position]
+                }
+            }
         }
         set(newValue) {
-            let (contentsIdx, nodeWithIdx) = head!.findNodeWithIndex(position)
-            precondition(nodeWithIdx?.contents != nil, "Index out of bounds")
-            nodeWithIdx!.contents![contentsIdx] = newValue
+            self = set(value: newValue, at: position)
+        }
+    }
+    
+    private func set(value: Element, at position: Int) -> Rope<Element> {
+        switch self {
+        case let .node(l, r):
+            if weight <= position {
+                precondition(r != nil, "Index out of bounds")
+                return .node(l: l, r: r!.set(value: value, at: position - weight))
+            } else {
+                precondition(l != nil, "Index out of bounds")
+                return .node(l: l!.set(value: value, at: position), r: r)
+            }
+        case .leaf(var contents):
+            contents[position] = value
+            return .leaf(value: contents)
         }
     }
 }
@@ -56,17 +65,36 @@ extension Rope: ExpressibleByArrayLiteral {
 extension Rope: RandomAccessCollection { }
 
 extension Rope: RangeReplaceableCollection {
-    mutating func append(contentsOf elements: [Element]) {
-        guard var parent = head, endIndex > 1 else {
-            head = RopeNode(elements)
-            return
+    mutating func append(contentsOf newElements: [Element]) {
+        self = rewritingAppend(contentsOf: newElements)
+        switch self {
+        case .leaf: assertionFailure("Could not insert")
+        case var .node(_, r):
+            switch r {
+            case .none: r = Rope(newElements)
+            case .some(.leaf):
+                r = .node(l: r, r: Rope(newElements))
+            case .some(.node):
+                r?.append(contentsOf: newElements)
+            }
         }
-        var curr: RopeNode? = parent
-        while curr != nil {
-            parent = curr!
-            curr = parent.right
+    }
+    
+    private mutating func rewritingAppend(contentsOf newElements: [Element]) -> Rope<Element> {
+        switch self {
+        case .leaf:
+            assertionFailure("Could not insert")
+            return .leaf(value: [])
+        case .node(let l, var r):
+            switch r {
+            case .none:
+                return .node(l: l, r: .leaf(value: newElements))
+            case .some(.leaf):
+                return .node(l: r, r: .leaf(value: newElements))
+            case .some(.node):
+                return r!.rewritingAppend(contentsOf: newElements)
+            }
         }
-        parent.right = RopeNode(elements)
     }
     
     mutating func append(_ e: Element) {

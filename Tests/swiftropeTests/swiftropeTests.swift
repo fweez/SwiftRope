@@ -36,7 +36,7 @@ final class swiftropeTests: XCTestCase {
         var r = Rope([0])
         XCTAssert(r[0] == 0)
         r[0] = 1
-        XCTAssert(r[0] == 1)
+        XCTAssert(r[0] == 1, "Rope \(r) had an incorrect element")
     }
     
     func testAppendElement() {
