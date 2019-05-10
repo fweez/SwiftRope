@@ -1,6 +1,34 @@
+extension Rope: Sequence {
+    func makeIterator() -> AnyIterator<Element> {
+        var nodeStack: [Rope] = [self]
+        var leafStack: [Element] = []
+        return AnyIterator {
+            while leafStack.count > 0 {
+                return leafStack.removeFirst()
+            }
+            while let next = nodeStack.popLast() {
+                switch next {
+                case let .leaf(contents):
+                    leafStack.append(contentsOf: contents)
+                    if leafStack.count > 0 { return leafStack.removeFirst() }
+                case let .node(l, r):
+                    if let r = r { nodeStack.append(r) }
+                    if let l = l { nodeStack.append(l) }
+                }
+            }
+            return nil
+        }
+    }
+}
+
 extension Rope: Collection {
     var startIndex: Int { return 0 }
-    var endIndex: Int { return weight }
+    var endIndex: Int {
+        switch self {
+        case let .leaf(contents): return contents.count
+        case let .node(_, r): return weight + (r?.endIndex ?? 0)
+        }
+    }
     
      func index(after i: Int) -> Int {
         precondition(i < self.weight, "Index out of bounds")
@@ -13,6 +41,15 @@ extension Rope: BidirectionalCollection {
         precondition(i > 0, "Index out of bounds")
         precondition(i <= endIndex, "Index out of bounds")
         return i - 1
+    }
+    
+    var last: Element? {
+        switch self {
+        case .leaf(let contents): return contents.last
+        case let .node(l, r):
+            if let result = r?.last { return result }
+            return l?.last
+        }
     }
 }
 
@@ -67,17 +104,6 @@ extension Rope: RandomAccessCollection { }
 extension Rope: RangeReplaceableCollection {
     mutating func append(contentsOf newElements: [Element]) {
         self = rewritingAppend(contentsOf: newElements)
-        switch self {
-        case .leaf: assertionFailure("Could not insert")
-        case var .node(_, r):
-            switch r {
-            case .none: r = Rope(newElements)
-            case .some(.leaf):
-                r = .node(l: r, r: Rope(newElements))
-            case .some(.node):
-                r?.append(contentsOf: newElements)
-            }
-        }
     }
     
     private mutating func rewritingAppend(contentsOf newElements: [Element]) -> Rope<Element> {
@@ -90,9 +116,9 @@ extension Rope: RangeReplaceableCollection {
             case .none:
                 return .node(l: l, r: .leaf(value: newElements))
             case .some(.leaf):
-                return .node(l: r, r: .leaf(value: newElements))
+                return .node(l: l, r: .node(l: r, r: .leaf(value: newElements)))
             case .some(.node):
-                return r!.rewritingAppend(contentsOf: newElements)
+                return .node(l: l, r: r!.rewritingAppend(contentsOf: newElements))
             }
         }
     }
@@ -101,10 +127,19 @@ extension Rope: RangeReplaceableCollection {
         append(contentsOf: [e])
     }
     
-    func replaceSubrange<C>(_ subrange: Range<Rope.Index>, with newElements: __owned C) where C : Collection, Rope.Element == C.Element {
+    mutating func replaceSubrange<C>(_ subrange: Range<Rope.Index>, with newElements: __owned C) where C : Collection, Rope.Element == C.Element {
         // The basic idea is we split our rope into three ropes:
         // rope.start..<subrange.start, subrange.start...subrange.end, subrange.end+1..rope.end
         // then discard the middle rope
+        precondition(subrange.startIndex >= 0)
+        precondition(subrange.endIndex <= count)
+        var (first, b) = self.split(at: subrange.startIndex)
+        let (_, third) = b!.split(at: subrange.endIndex - subrange.startIndex)
         // then insert the newElements between the first and last rope
+        switch first! {
+        case .leaf: first = .node(l: first, r: nil)
+        case .node: break
+        }
+        self = first!.appendRope(.leaf(value: Array(newElements))).appendRope(third)
     }
 }

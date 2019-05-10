@@ -10,13 +10,7 @@ indirect enum Rope<Element> {
     case node(l: Rope<Element>?, r: Rope<Element>?)
     
     var sumOfLeaves: Int {
-        switch self {
-        case .leaf(let value): return value.count
-        case let .node(l, r):
-            let sumLeft = l?.sumOfLeaves ?? 0
-            let sumRight = r?.sumOfLeaves ?? 0
-            return sumLeft + sumRight
-        }
+        return fold( { ($0 ?? 0) + ($1 ?? 0) }, { $0.count }) ?? 0
     }
 
     var weight: Int {
@@ -32,6 +26,18 @@ indirect enum Rope<Element> {
     
     init(_ elements: [Element]) {
         self = .node(l: .leaf(value: elements), r: nil)
+    }
+    
+    init?(l: Rope<Element>?, r: Rope<Element>?) {
+        if l != nil || r != nil { self = .node(l: l, r: r) }
+        else { return nil }
+    }
+    
+    func fold<Result>(_ nodeCase: (Result?, Result?) -> Result?, _ leafCase: ([Element]) -> Result?) -> Result? {
+        switch self {
+        case let .node(l, r): return nodeCase(l?.fold(nodeCase, leafCase), r?.fold(nodeCase, leafCase))
+        case let .leaf(contents): return leafCase(contents)
+        }
     }
     
     internal func insertRope(_ newRope: Rope<Element>, depth: Int = 0, balancedRopes: inout [Int: Rope<Element>]) {
@@ -83,13 +89,56 @@ indirect enum Rope<Element> {
         return newHead
     }
     
+    func appendRope(_ newSubRope: Rope<Element>?) -> Rope<Element> {
+        guard newSubRope != nil else { return self }
+        switch self {
+        case .leaf:
+            return .node(l: self, r: newSubRope)
+        case let .node(l, r):
+            if let r = r {
+                return .node(l: l, r: r.appendRope(newSubRope))
+            } else {
+                return .node(l: l, r: newSubRope)
+            }
+        }
+    }
+    
+    func prependRope(_ newSubRope: Rope<Element>?) -> Rope<Element> {
+        guard newSubRope != nil else { return self }
+        switch self {
+        case .leaf:
+            return Rope<Element>.node(l: newSubRope, r: self)
+        case let .node(l, r):
+            return Rope<Element>.node(l: l?.prependRope(newSubRope), r: r)
+        }
+    }
+    
     // Split this rope into two unbalanced ropes.
-    func split(at splitIndex: Int) -> (Rope<Element>, Rope<Element>?) {
-        precondition(splitIndex <= weight, "Index out of bounds")
-        if splitIndex == weight { return (self, nil) }
-        
-        //FIXME
-        return (self, nil)
+    func split(at splitIndex: Int) -> (a: Rope<Element>?, b: Rope<Element>?) {
+        switch self {
+        case let .node(l, r):
+            if splitIndex <= weight {
+                let (a, b) = l?.split(at: splitIndex) ?? (nil, nil)
+                if let r = r {
+                    return (a, r.prependRope(b))
+                } else {
+                    return (a, Rope(l: b, r: nil))
+                }
+            } else {
+                let (a, b) = r?.split(at: splitIndex - weight) ?? (nil, nil)
+                if let l = l {
+                    return (l.appendRope(a), b)
+                } else {
+                    return (Rope(l: nil, r: a), b)
+                }
+            }
+        case let .leaf(contents):
+            if splitIndex == 0 { return (nil, self) }
+            if splitIndex == weight { return (self, nil) }
+            let aContents: [Element] = Array(contents.prefix(splitIndex))
+            let bContents: [Element] = Array(contents.suffix(from: splitIndex))
+            return (.leaf(value: aContents), .leaf(value: bContents))
+        }
     }
 }
 
