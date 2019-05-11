@@ -75,6 +75,16 @@ final class swiftropeTests: XCTestCase {
         _ = r.enumerated().map { XCTAssertEqual($0, $1) }
     }
     
+    func testGoodnessThatsALotOfAppending() {
+        var r = Rope(Array(0..<2))
+        for i in 1..<200 {
+            let start = 2 * i
+            let end = 2 * (i + 1)
+            r.append(contentsOf: Array(start..<end))
+        }
+        _ = r.enumerated().map { XCTAssertEqual($0, $1) }
+    }
+    
     func testLast() {
         var r = Rope([1,2,3])
         XCTAssertEqual(r.last, 3)
@@ -146,5 +156,31 @@ final class swiftropeTests: XCTestCase {
         XCTAssertEqual(r[3], 30)
         XCTAssertEqual(r[4], 4)
         XCTAssertEqual(r.count, 10)
+    }
+    
+    func testSimpleReversed() {
+        let r = Rope(Array(0..<10)).reversed()
+        XCTAssertEqual(r[0], 9)
+        XCTAssertEqual(r[9], 0)
+    }
+    
+    func testNotSimpleReversed() {
+        var a: Rope = [0, 1, 2]
+        a.append(contentsOf: [3, 4, 5])
+        var b: Rope = [6, 7, 8]
+        b.append(contentsOf: [9])
+        let c = a.appendRope(b).reversed()
+        XCTAssertEqual(c[0], 9)
+        XCTAssertEqual(c[9], 0)
+    }
+    
+    func testMap() {
+        var a: Rope = [0, 1, 2]
+        a.append(contentsOf: [3, 4, 5])
+        var b: Rope = [6, 7, 8]
+        b.append(contentsOf: [9])
+        let c = a.appendRope(b).map({ "\($0)" })
+        XCTAssertEqual(c[0], "0")
+        XCTAssertEqual(c[9], "9")
     }
 }

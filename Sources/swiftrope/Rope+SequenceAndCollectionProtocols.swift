@@ -19,6 +19,14 @@ extension Rope: Sequence {
             return nil
         }
     }
+
+    func reversed() -> Rope {
+        return fold({ .node(l: $1, r: $0) }, { .leaf(value: Array($0.reversed())) }) ?? .node(l: nil, r: nil)
+    }
+    
+    func map<T>(_ transform: (Element) throws -> T) rethrows -> Rope<T> {
+        return try fold({ .node(l: $0, r: $1) }, { .leaf(value: try $0.map(transform)) }) ?? .node(l: nil, r: nil)
+    }
 }
 
 extension Rope: Collection {

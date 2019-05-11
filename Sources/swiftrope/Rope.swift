@@ -33,10 +33,10 @@ indirect enum Rope<Element> {
         else { return nil }
     }
     
-    func fold<Result>(_ nodeCase: (Result?, Result?) -> Result?, _ leafCase: ([Element]) -> Result?) -> Result? {
+    func fold<Result>(_ nodeCase: (Result?, Result?) throws -> Result?, _ leafCase: ([Element]) throws -> Result?) rethrows -> Result? {
         switch self {
-        case let .node(l, r): return nodeCase(l?.fold(nodeCase, leafCase), r?.fold(nodeCase, leafCase))
-        case let .leaf(contents): return leafCase(contents)
+        case let .node(l, r): return try nodeCase(l?.fold(nodeCase, leafCase), r?.fold(nodeCase, leafCase))
+        case let .leaf(contents): return try leafCase(contents)
         }
     }
     
