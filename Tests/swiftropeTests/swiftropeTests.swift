@@ -164,23 +164,70 @@ final class swiftropeTests: XCTestCase {
         XCTAssertEqual(r[9], 0)
     }
     
-    func testNotSimpleReversed() {
+    fileprivate var complexTenElementRope: Rope<Int> {
         var a: Rope = [0, 1, 2]
         a.append(contentsOf: [3, 4, 5])
         var b: Rope = [6, 7, 8]
         b.append(contentsOf: [9])
-        let c = a.appendRope(b).reversed()
-        XCTAssertEqual(c[0], 9)
-        XCTAssertEqual(c[9], 0)
+        return a.appendRope(b)
+    }
+    
+    func testNotSimpleReversed() {
+        let r = complexTenElementRope.reversed()
+        XCTAssertEqual(r[0], 9)
+        XCTAssertEqual(r[9], 0)
     }
     
     func testMap() {
-        var a: Rope = [0, 1, 2]
-        a.append(contentsOf: [3, 4, 5])
-        var b: Rope = [6, 7, 8]
-        b.append(contentsOf: [9])
-        let c = a.appendRope(b).map({ "\($0)" })
-        XCTAssertEqual(c[0], "0")
-        XCTAssertEqual(c[9], "9")
+        let r = complexTenElementRope.map({ "\($0)" })
+        XCTAssertEqual(r[0], "0")
+        XCTAssertEqual(r[9], "9")
+    }
+    
+    func testReduce() {
+        let rope = complexTenElementRope
+        let array = Array(0..<10)
+        XCTAssertEqual(rope.reduce(0, +), array.reduce(0, +))
+        XCTAssertEqual(rope.reduce(0, -), array.reduce(0, -))
+        let s = { (i: String, x: Int) -> String in i + String(x) }
+        XCTAssertEqual(rope.reduce("", s), array.reduce("", s))
+    }
+    
+    func testShortPrefix() {
+        let slice = complexTenElementRope.prefix(2)
+        XCTAssertEqual(slice[0], 0)
+        XCTAssertEqual(slice[1], 1)
+        XCTAssertEqual(slice.count, 2)
+    }
+    
+    func testTooLongPrefix() {
+        let slice = complexTenElementRope.prefix(20)
+        XCTAssertEqual(slice[0], 0)
+        XCTAssertEqual(slice[9], 9)
+        XCTAssertEqual(slice.count, 10)
+    }
+    
+    func testZeroPrefix() {
+        let slice = complexTenElementRope.prefix(0)
+        XCTAssertEqual(slice.count, 0)
+    }
+
+    func testShortSuffix() {
+        let slice = complexTenElementRope.suffix(2)
+        XCTAssertEqual(slice[0], 8)
+        XCTAssertEqual(slice[1], 9)
+        XCTAssertEqual(slice.count, 2)
+    }
+    
+    func testTooLongSuffix() {
+        let slice = complexTenElementRope.suffix(20)
+        XCTAssertEqual(slice[0], 0)
+        XCTAssertEqual(slice[9], 9)
+        XCTAssertEqual(slice.count, 10)
+    }
+    
+    func testZeroSuffix() {
+        let slice = complexTenElementRope.suffix(0)
+        XCTAssertEqual(slice.count, 0)
     }
 }
