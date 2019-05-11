@@ -21,11 +21,11 @@ extension Rope: Sequence {
     }
 
     func reversed() -> Rope {
-        return fold({ .node(l: $1, r: $0) }, { .leaf(value: Array($0.reversed())) }) ?? .node(l: nil, r: nil)
+        return fold({ .node(l: $1, r: $0) }, { .leaf(contents: Array($0.reversed())) }) ?? .node(l: nil, r: nil)
     }
     
     func map<T>(_ transform: (Element) throws -> T) rethrows -> Rope<T> {
-        return try fold({ .node(l: $0, r: $1) }, { .leaf(value: try $0.map(transform)) }) ?? .node(l: nil, r: nil)
+        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.map(transform)) }) ?? .node(l: nil, r: nil)
     }
     
     func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
@@ -120,7 +120,7 @@ extension Rope: MutableCollection {
             }
         case .leaf(var contents):
             contents[position] = value
-            return .leaf(value: contents)
+            return .leaf(contents: contents)
         }
     }
 }
@@ -145,13 +145,13 @@ extension Rope: RangeReplaceableCollection {
         switch self {
         case .leaf:
             assertionFailure("Could not insert")
-            return .leaf(value: [])
+            return .leaf(contents: [])
         case .node(let l, var r):
             switch r {
             case .none:
-                return .node(l: l, r: .leaf(value: newElements))
+                return .node(l: l, r: .leaf(contents: newElements))
             case .some(.leaf):
-                return .node(l: l, r: .node(l: r, r: .leaf(value: newElements)))
+                return .node(l: l, r: .node(l: r, r: .leaf(contents: newElements)))
             case .some(.node):
                 return .node(l: l, r: r!.rewritingAppend(contentsOf: newElements))
             }
@@ -175,6 +175,6 @@ extension Rope: RangeReplaceableCollection {
         case .leaf: first = .node(l: first, r: nil)
         case .node: break
         }
-        self = first!.appendRope(.leaf(value: Array(newElements))).appendRope(third)
+        self = first!.appendRope(.leaf(contents: Array(newElements))).appendRope(third)
     }
 }

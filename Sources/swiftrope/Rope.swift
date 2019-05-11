@@ -6,7 +6,7 @@
 //
 
 indirect enum Rope<Element> {
-    case leaf(value: [Element])
+    case leaf(contents: [Element])
     case node(l: Rope<Element>?, r: Rope<Element>?)
     
     var sumOfLeaves: Int {
@@ -25,7 +25,7 @@ indirect enum Rope<Element> {
     }
     
     init(_ elements: [Element]) {
-        self = .node(l: .leaf(value: elements), r: nil)
+        self = .node(l: .leaf(contents: elements), r: nil)
     }
     
     init?(l: Rope<Element>?, r: Rope<Element>?) {
@@ -137,7 +137,7 @@ indirect enum Rope<Element> {
             if splitIndex == weight { return (self, nil) }
             let aContents: [Element] = Array(contents.prefix(splitIndex))
             let bContents: [Element] = Array(contents.suffix(from: splitIndex))
-            return (.leaf(value: aContents), .leaf(value: bContents))
+            return (.leaf(contents: aContents), .leaf(contents: bContents))
         }
     }
 }
