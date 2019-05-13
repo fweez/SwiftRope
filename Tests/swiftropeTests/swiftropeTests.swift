@@ -230,4 +230,26 @@ final class swiftropeTests: XCTestCase {
         let slice = complexTenElementRope.suffix(0)
         XCTAssertEqual(slice.count, 0)
     }
+    
+    func testHeight() {
+        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: nil), r: nil)
+        XCTAssertEqual(rope.height, 3)
+    }
+    
+    func testRebalanceLongLeft() {
+        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
+        guard let balanced = rope.rebalanced() else {
+            XCTFail()
+            return
+        }
+        XCTAssertEqual(Array(balanced), [1, 2])
+    }
+    func testRebalanceLongRight() {
+        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
+        guard let balanced = rope.rebalanced() else {
+            XCTFail()
+            return
+        }
+        XCTAssertEqual(Array(balanced), [1, 2])
+    }
 }

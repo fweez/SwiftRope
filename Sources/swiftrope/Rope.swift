@@ -20,6 +20,10 @@ indirect enum Rope<Element> {
         }
     }
     
+    var height: Int {
+        return fold({ Swift.max($0 ?? 0, $1 ?? 0) + 1 }, { _ in return 0 }) ?? 0
+    }
+    
     init() {
         self = .node(l: nil, r: nil)
     }
@@ -40,42 +44,29 @@ indirect enum Rope<Element> {
         }
     }
     
-    internal func insertRope(_ newRope: Rope<Element>, depth: Int = 0, balancedRopes: inout [Int: Rope<Element>]) {
-        switch newRope {
-        case .node: assertionFailure("Must insert a leaf node!")
-        case .leaf:
+    internal func rebalanced() -> Rope<Element>? {
+        var balancedRopes: [Int: Rope<Element>] = [:]
+
+        func insertRope(_ newRope: Rope<Element>, depth: Int = 0) {
             guard let extantRope = balancedRopes[depth] else {
                 balancedRopes[depth] = newRope
                 return
             }
-            switch extantRope {
-            case .leaf:
-                balancedRopes[depth] = nil
-                insertRope(.node(l: extantRope, r: newRope), depth: depth + 1, balancedRopes: &balancedRopes)
-            case let .node(l, r) where l != nil && r != nil:
-                balancedRopes[depth] = nil
-                insertRope(.node(l: extantRope, r: newRope), depth: depth + 1, balancedRopes: &balancedRopes)
-            case let .node(l, r) where r == nil:
-                balancedRopes[depth] = .node(l: l, r: newRope)
-            default:
-                assertionFailure()
+            balancedRopes[depth] = nil
+            let next = extantRope.appendRope(newRope)
+            insertRope(next, depth: depth + 1)
+        }
+        
+        func insertLeaves(in node: Rope<Element>) {
+            switch node {
+            case .leaf: insertRope(node)
+            case let .node(l, r):
+                if let left = l { insertLeaves(in: left) }
+                if let right = r { insertLeaves(in: right) }
             }
         }
-    }
-    
-    internal func insertLeaves(in node: Rope<Element>, balancedRopes: inout [Int: Rope<Element>]) {
-        switch node {
-        case .leaf: insertRope(node, balancedRopes: &balancedRopes)
-        case let .node(l, r):
-            if let left = l { insertLeaves(in: left, balancedRopes: &balancedRopes) }
-            if let right = r { insertLeaves(in: right, balancedRopes: &balancedRopes) }
-        }
-    }
-    
-    internal func rebalanced() -> Rope<Element>? {
-        var balancedRopes: [Int: Rope<Element>] = [:]
         
-        insertLeaves(in: self, balancedRopes: &balancedRopes)
+        insertLeaves(in: self)
         var newHead: Rope<Element>? = nil
         for rope in balancedRopes.sorted(by: { $0.0 < $1.0 }).map({ $0.1 }) {
             guard let left = newHead else {
@@ -148,5 +139,13 @@ extension Rope: CustomStringConvertible {
         case .leaf(let v): return v.description
         case let .node(l, r): return (l?.description ?? "") + (r?.description ?? "")
         }
+    }
+}
+
+extension Rope: ExpressibleByArrayLiteral {
+    typealias ArrayLiteralElement = Element
+    
+    init(arrayLiteral elements: Rope.ArrayLiteralElement...) {
+        self.init(elements)
     }
 }
