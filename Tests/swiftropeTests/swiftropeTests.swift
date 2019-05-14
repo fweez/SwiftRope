@@ -184,6 +184,23 @@ final class swiftropeTests: XCTestCase {
         XCTAssertEqual(r[9], "9")
     }
     
+    enum TestError: Error {
+        case justSomeError
+    }
+    
+    func testMapThrows() {
+        do {
+            dump(try self.complexTenElementRope.map { _ in
+                throw TestError.justSomeError
+            })
+        } catch _ as TestError {
+            return
+        } catch {
+            XCTFail()
+        }
+        XCTFail()
+    }
+    
     func testReduce() {
         let rope = complexTenElementRope
         let array = Array(0..<10)

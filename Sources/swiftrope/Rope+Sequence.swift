@@ -28,6 +28,10 @@ extension Rope: Sequence {
         return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.map(transform)) }) ?? .node(l: nil, r: nil)
     }
     
+    func compactMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> Rope<ElementOfResult> {
+        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.compactMap(transform)) }) ?? .node(l: nil, r: nil)
+    }
+    
     func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
         switch self {
         case let .leaf(contents): return try contents.reduce(initialResult, nextPartialResult)
