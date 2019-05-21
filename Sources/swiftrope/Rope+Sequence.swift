@@ -9,7 +9,7 @@ extension Rope: Sequence {
             while let next = nodeStack.popLast() {
                 switch next {
                 case let .leaf(contents):
-                    leafStack.append(contentsOf: contents)
+                    if contents.count > 0 { leafStack.append(contentsOf: contents) }
                     if leafStack.count > 0 { return leafStack.removeFirst() }
                 case let .node(l, r):
                     if let r = r { nodeStack.append(r) }
@@ -21,15 +21,15 @@ extension Rope: Sequence {
     }
 
     func reversed() -> Rope {
-        return fold({ .node(l: $1, r: $0) }, { .leaf(contents: Array($0.reversed())) }) ?? .node(l: nil, r: nil)
+        return fold({ .node(l: $1, r: $0) }, { .leaf(contents: Array($0.reversed())) }) 
     }
     
     func map<T>(_ transform: (Element) throws -> T) rethrows -> Rope<T> {
-        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.map(transform)) }) ?? .node(l: nil, r: nil)
+        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.map(transform)) }) 
     }
     
     func compactMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> Rope<ElementOfResult> {
-        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.compactMap(transform)) }) ?? .node(l: nil, r: nil)
+        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.compactMap(transform)) })
     }
     
     func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
@@ -46,7 +46,7 @@ extension Rope: Sequence {
         guard maxLength <= count else { return Slice(self) }
         let splitPosition = Swift.min(maxLength, count)
         let (prefixRope, _) = split(at: splitPosition)
-        return Slice(prefixRope ?? Rope([]))
+        return Slice(prefixRope!)
     }
     
     func suffix(_ maxLength: Int) -> Slice<Rope<Element>> {
@@ -54,6 +54,6 @@ extension Rope: Sequence {
         guard maxLength <= count else { return Slice(self) }
         let splitPosition = Swift.max(0, count - maxLength)
         let (_, suffixRope) = split(at: splitPosition)
-        return Slice(suffixRope ?? Rope([]))
+        return Slice(suffixRope!)
     }
 }

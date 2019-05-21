@@ -10,7 +10,7 @@ indirect enum Rope<Element> {
     case node(l: Rope<Element>?, r: Rope<Element>?)
     
     var sumOfLeaves: Int {
-        return fold( { ($0 ?? 0) + ($1 ?? 0) }, { $0.count }) ?? 0
+        return fold( { ($0 ?? 0) + ($1 ?? 0) }, { $0.count })
     }
 
     var weight: Int {
@@ -21,7 +21,7 @@ indirect enum Rope<Element> {
     }
     
     var height: Int {
-        return fold({ Swift.max($0 ?? 0, $1 ?? 0) + 1 }, { _ in return 0 }) ?? 0
+        return fold({ Swift.max($0 ?? 0, $1 ?? 0) + 1 }, { _ in return 0 })
     }
     
     init() {
@@ -37,47 +37,16 @@ indirect enum Rope<Element> {
         else { return nil }
     }
     
-    func fold<Result>(_ nodeCase: (Result?, Result?) throws -> Result?, _ leafCase: ([Element]) throws -> Result?) rethrows -> Result? {
+    func fold<Result>(_ nodeCase: (Result?, Result?) throws -> Result, _ leafCase: ([Element]) throws -> Result) rethrows -> Result {
         switch self {
         case let .node(l, r): return try nodeCase(l?.fold(nodeCase, leafCase), r?.fold(nodeCase, leafCase))
         case let .leaf(contents): return try leafCase(contents)
         }
     }
     
-    internal func rebalanced() -> Rope<Element>? {
-        var balancedRopes: [Int: Rope<Element>] = [:]
-
-        func insertRope(_ newRope: Rope<Element>, depth: Int = 0) {
-            guard let extantRope = balancedRopes[depth] else {
-                balancedRopes[depth] = newRope
-                return
-            }
-            balancedRopes[depth] = nil
-            let next = extantRope.appendRope(newRope)
-            insertRope(next, depth: depth + 1)
-        }
-        
-        func insertLeaves(in node: Rope<Element>) {
-            switch node {
-            case .leaf: insertRope(node)
-            case let .node(l, r):
-                if let left = l { insertLeaves(in: left) }
-                if let right = r { insertLeaves(in: right) }
-            }
-        }
-        
-        insertLeaves(in: self)
-        var newHead: Rope<Element>? = nil
-        for rope in balancedRopes.sorted(by: { $0.0 < $1.0 }).map({ $0.1 }) {
-            guard let left = newHead else {
-                newHead = rope
-                continue
-            }
-            
-            newHead = .node(l: left, r: rope)
-        }
-        
-        return newHead
+    internal func rebalanced(minLeafSize: Int, maxLeafSize: Int) -> Rope<Element>? {
+        var balancer = RopeBalancer(rope: self, minLeafSize: minLeafSize, maxLeafSize: maxLeafSize)
+        return balancer.balanced()
     }
     
     func appendRope(_ newSubRope: Rope<Element>?) -> Rope<Element> {
@@ -149,3 +118,5 @@ extension Rope: ExpressibleByArrayLiteral {
         self.init(elements)
     }
 }
+
+extension Rope: Equatable where Element: Equatable { }
