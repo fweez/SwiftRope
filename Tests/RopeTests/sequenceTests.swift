@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import swiftrope
+@testable import Rope
 
 class sequenceTests: XCTestCase {
     func testSimpleIteration() {

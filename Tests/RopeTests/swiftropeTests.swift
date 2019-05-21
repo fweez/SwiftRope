@@ -1,5 +1,5 @@
 import XCTest
-@testable import swiftrope
+@testable import Rope
 
 final class swiftropeTests: XCTestCase {
     func testBareInit() {
