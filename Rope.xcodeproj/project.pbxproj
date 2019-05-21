@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		9464B3A822946A9700FEBF7B /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9464B3A722946A9700FEBF7B /* PerformanceTests.swift */; };
 		OBJ_28 /* Rope+Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* Rope+Collection.swift */; };
 		OBJ_29 /* Rope+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* Rope+Sequence.swift */; };
 		OBJ_30 /* Rope.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Rope.swift */; };
@@ -51,6 +52,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9464B3A722946A9700FEBF7B /* PerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
+		9464B3A9229472CC00FEBF7B /* rope.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = rope.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		OBJ_10 /* Rope+Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rope+Sequence.swift"; sourceTree = "<group>"; };
 		OBJ_11 /* Rope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rope.swift; sourceTree = "<group>"; };
 		OBJ_12 /* RopeBalancer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RopeBalancer.swift; sourceTree = "<group>"; };
@@ -97,6 +100,7 @@
 			children = (
 				OBJ_16 /* XCTestManifests.swift */,
 				OBJ_18 /* RopeTests.swift */,
+				9464B3A722946A9700FEBF7B /* PerformanceTests.swift */,
 				OBJ_15 /* CollectionTests.swift */,
 				OBJ_17 /* SequenceTests.swift */,
 			);
@@ -117,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
+				9464B3A9229472CC00FEBF7B /* rope.playground */,
 				OBJ_7 /* Sources */,
 				OBJ_13 /* Tests */,
 				OBJ_19 /* Products */,
@@ -138,8 +143,8 @@
 			children = (
 				OBJ_11 /* Rope.swift */,
 				OBJ_12 /* RopeBalancer.swift */,
-				OBJ_9 /* Rope+Collection.swift */,
 				OBJ_10 /* Rope+Sequence.swift */,
+				OBJ_9 /* Rope+Collection.swift */,
 			);
 			name = Rope;
 			path = Sources/Rope;
@@ -252,6 +257,7 @@
 				OBJ_49 /* CollectionTests.swift in Sources */,
 				OBJ_50 /* XCTestManifests.swift in Sources */,
 				OBJ_51 /* SequenceTests.swift in Sources */,
+				9464B3A822946A9700FEBF7B /* PerformanceTests.swift in Sources */,
 				OBJ_52 /* RopeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

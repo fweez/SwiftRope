@@ -70,4 +70,20 @@ class CollectionTests: XCTestCase {
         XCTAssertEqual(r[4], 4)
         XCTAssertEqual(r.count, 10)
     }
+    
+    func testReplaceBeforeFirstElement() {
+        var r = Rope(Array(0..<10))
+        r.replaceSubrange(0..<1, with: [99])
+        XCTAssertEqual(r[0], 99)
+        XCTAssertEqual(r[1], 0)
+        XCTAssertEqual(r.count, 11)
+    }
+    
+    func testReplaceLastElement() {
+        var r = Rope(Array(0..<10))
+        r.replaceSubrange(9..<10, with: [99])
+        XCTAssertEqual(r[0], 0)
+        XCTAssertEqual(r[10], 99)
+        XCTAssertEqual(r.count, 11)
+    }
 }

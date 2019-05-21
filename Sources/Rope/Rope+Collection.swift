@@ -101,13 +101,20 @@ extension Rope: RangeReplaceableCollection {
         // then discard the middle rope
         precondition(subrange.startIndex >= 0)
         precondition(subrange.endIndex <= count)
-        var (first, b) = self.split(at: subrange.startIndex)
+        let (a, b) = self.split(at: subrange.startIndex)
         let (_, third) = b!.split(at: subrange.endIndex - subrange.startIndex)
+        
         // then insert the newElements between the first and last rope
-        switch first! {
+        // if the first rope is empty, newElements should be first:
+        guard var first = a else {
+            self = .node(l: .leaf(contents: Array(newElements)), r: b)
+            return
+        }
+        
+        switch first {
         case .leaf: first = .node(l: first, r: nil)
         case .node: break
         }
-        self = first!.appendRope(.leaf(contents: Array(newElements))).appendRope(third)
+        self = first.appendRope(.leaf(contents: Array(newElements))).appendRope(third)
     }
 }
