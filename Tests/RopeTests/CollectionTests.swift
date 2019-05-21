@@ -1,10 +1,3 @@
-//
-//  CollectionTests.swift
-//  swiftropeTests
-//
-//  Created by Ryan Forsythe on 5/21/19.
-//
-
 import XCTest
 @testable import Rope
 

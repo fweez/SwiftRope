@@ -1,14 +1,7 @@
-//
-//  sequenceTests.swift
-//  swiftropeTests
-//
-//  Created by Ryan Forsythe on 5/21/19.
-//
-
 import XCTest
 @testable import Rope
 
-class sequenceTests: XCTestCase {
+class SequenceTests: XCTestCase {
     func testSimpleIteration() {
         let r = Rope([0, 1, 2])
         _ = r.enumerated().map { XCTAssertEqual($0, $1) }

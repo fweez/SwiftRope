@@ -1,7 +1,7 @@
 import XCTest
 @testable import Rope
 
-final class swiftropeTests: XCTestCase {
+final class RopeTests: XCTestCase {
     func testBareInit() {
         let r = Rope<Int>()
         XCTAssert(r.startIndex == 0)
