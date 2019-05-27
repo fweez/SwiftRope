@@ -63,27 +63,25 @@ class CollectionTests: XCTestCase {
     
     func testSimpleReplaceSubrange() {
         var r = Rope(Array(0..<10))
+        var a = Array(0..<10)
         r.replaceSubrange(2..<4, with: [20, 30])
-        XCTAssertEqual(r[1], 1)
-        XCTAssertEqual(r[2], 20)
-        XCTAssertEqual(r[3], 30)
-        XCTAssertEqual(r[4], 4)
-        XCTAssertEqual(r.count, 10)
+        a.replaceSubrange(2..<4, with: [20, 30])
+        XCTAssertEqual(Array(r), a)
     }
     
     func testReplaceBeforeFirstElement() {
         var r = Rope(Array(0..<10))
+        var a = Array(0..<10)
         r.replaceSubrange(0..<1, with: [99])
-        XCTAssertEqual(r[0], 99)
-        XCTAssertEqual(r[1], 0)
-        XCTAssertEqual(r.count, 11)
+        a.replaceSubrange(0..<1, with: [99])
+        XCTAssertEqual(Array(r), a)
     }
     
     func testReplaceLastElement() {
         var r = Rope(Array(0..<10))
+        var a = Array(0..<10)
         r.replaceSubrange(9..<10, with: [99])
-        XCTAssertEqual(r[0], 0)
-        XCTAssertEqual(r[10], 99)
-        XCTAssertEqual(r.count, 11)
+        a.replaceSubrange(9..<10, with: [99])
+        XCTAssertEqual(Array(r), a)
     }
 }

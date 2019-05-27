@@ -23,7 +23,7 @@ indirect enum Rope<Element> {
     var height: Int {
         return fold({ Swift.max($0 ?? 0, $1 ?? 0) + 1 }, { _ in return 0 })
     }
-    
+        
     init() {
         self = .node(l: nil, r: nil)
     }
@@ -44,22 +44,19 @@ indirect enum Rope<Element> {
         }
     }
     
-    internal func rebalanced(minLeafSize: Int, maxLeafSize: Int) -> Rope<Element>? {
-        var balancer = RopeBalancer(rope: self, minLeafSize: minLeafSize, maxLeafSize: maxLeafSize)
-        return balancer.balanced()
-    }
-    
-    func appendRope(_ newSubRope: Rope<Element>?) -> Rope<Element> {
+     func appendRope(_ newSubRope: Rope<Element>?) -> Rope<Element> {
         guard newSubRope != nil else { return self }
         switch self {
         case .leaf:
             return .node(l: self, r: newSubRope)
         case let .node(l, r):
-            if let r = r {
-                return .node(l: l, r: r.appendRope(newSubRope))
-            } else {
-                return .node(l: l, r: newSubRope)
+            guard let left = l else {
+                return .node(l: newSubRope, r: r)
             }
+            guard let right = r else {
+                return .node(l: left, r: newSubRope)
+            }
+            return .node(l: left, r: right.appendRope(newSubRope))
         }
     }
     
@@ -104,9 +101,13 @@ indirect enum Rope<Element> {
 
 extension Rope: CustomStringConvertible {
     var description: String {
+        return "Height: \(height); contents: \(contentDescription)"
+    }
+    
+    var contentDescription: String {
         switch self {
         case .leaf(let v): return v.description
-        case let .node(l, r): return (l?.description ?? "") + (r?.description ?? "")
+        case let .node(l, r): return (l?.contentDescription ?? "") + (r?.contentDescription ?? "")
         }
     }
 }

@@ -22,10 +22,11 @@
 
 /* Begin PBXBuildFile section */
 		9464B3A822946A9700FEBF7B /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9464B3A722946A9700FEBF7B /* PerformanceTests.swift */; };
+		9464B3C722949E7300FEBF7B /* RebalanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9464B3C622949E7300FEBF7B /* RebalanceTests.swift */; };
 		OBJ_28 /* Rope+Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* Rope+Collection.swift */; };
 		OBJ_29 /* Rope+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* Rope+Sequence.swift */; };
 		OBJ_30 /* Rope.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Rope.swift */; };
-		OBJ_31 /* RopeBalancer.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* RopeBalancer.swift */; };
+		OBJ_31 /* RopeBalancing.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* RopeBalancing.swift */; };
 		OBJ_38 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 		OBJ_49 /* CollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* CollectionTests.swift */; };
 		OBJ_50 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* XCTestManifests.swift */; };
@@ -54,9 +55,10 @@
 /* Begin PBXFileReference section */
 		9464B3A722946A9700FEBF7B /* PerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
 		9464B3A9229472CC00FEBF7B /* rope.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = rope.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		9464B3C622949E7300FEBF7B /* RebalanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RebalanceTests.swift; sourceTree = "<group>"; };
 		OBJ_10 /* Rope+Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rope+Sequence.swift"; sourceTree = "<group>"; };
 		OBJ_11 /* Rope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rope.swift; sourceTree = "<group>"; };
-		OBJ_12 /* RopeBalancer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RopeBalancer.swift; sourceTree = "<group>"; };
+		OBJ_12 /* RopeBalancing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RopeBalancing.swift; sourceTree = "<group>"; };
 		OBJ_15 /* CollectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTests.swift; sourceTree = "<group>"; };
 		OBJ_16 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
 		OBJ_17 /* SequenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceTests.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 			children = (
 				OBJ_16 /* XCTestManifests.swift */,
 				OBJ_18 /* RopeTests.swift */,
+				9464B3C622949E7300FEBF7B /* RebalanceTests.swift */,
 				9464B3A722946A9700FEBF7B /* PerformanceTests.swift */,
 				OBJ_15 /* CollectionTests.swift */,
 				OBJ_17 /* SequenceTests.swift */,
@@ -117,7 +120,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -127,7 +130,6 @@
 				OBJ_19 /* Products */,
 				OBJ_22 /* README.md */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -142,7 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_11 /* Rope.swift */,
-				OBJ_12 /* RopeBalancer.swift */,
+				OBJ_12 /* RopeBalancing.swift */,
 				OBJ_10 /* Rope+Sequence.swift */,
 				OBJ_9 /* Rope+Collection.swift */,
 			);
@@ -217,7 +219,7 @@
 				English,
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_19 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -238,7 +240,7 @@
 				OBJ_28 /* Rope+Collection.swift in Sources */,
 				OBJ_29 /* Rope+Sequence.swift in Sources */,
 				OBJ_30 /* Rope.swift in Sources */,
-				OBJ_31 /* RopeBalancer.swift in Sources */,
+				OBJ_31 /* RopeBalancing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,6 +261,7 @@
 				OBJ_51 /* SequenceTests.swift in Sources */,
 				9464B3A822946A9700FEBF7B /* PerformanceTests.swift in Sources */,
 				OBJ_52 /* RopeTests.swift in Sources */,
+				9464B3C722949E7300FEBF7B /* RebalanceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

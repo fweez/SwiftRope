@@ -107,7 +107,7 @@ extension Rope: RangeReplaceableCollection {
         // then insert the newElements between the first and last rope
         // if the first rope is empty, newElements should be first:
         guard var first = a else {
-            self = .node(l: .leaf(contents: Array(newElements)), r: b)
+            self = .node(l: .leaf(contents: Array(newElements)), r: third)
             return
         }
         

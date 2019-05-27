@@ -9,17 +9,26 @@ import XCTest
 @testable import Rope
 
 class PerformanceTests: XCTestCase {
-    func testPerformanceExample() {
+    func testRopePerformance() {
         measure {
             var rope: Rope<Int> = [0]
-            for i in 0..<10000 {
+            for i in 0..<1000 {
                 let idx = Int(arc4random_uniform(UInt32(rope.count)))
                 rope.replaceSubrange(idx..<idx+1, with: [1, 2, 3, 4])
-                if i % 100 == 0 { rope = rope.rebalanced(minLeafSize: 0, maxLeafSize: Int.max)! }
+                if i % 100 == 0 { rope = rope.balanced(minLeafSize: 0, maxLeafSize: Int.max)! }
             }
         }
-        
-        
     }
 
+    func testStringPerformance() {
+        measure {
+            var s = "0"
+            for _ in 0..<1000 {
+                let offset = Int(arc4random_uniform(UInt32(s.count)))
+                let startIdx = s.index(s.startIndex, offsetBy: offset)
+                let endIdx = s.index(startIdx, offsetBy: 1)
+                s.replaceSubrange(startIdx..<endIdx, with: "1234")
+            }
+        }
+    }
 }
