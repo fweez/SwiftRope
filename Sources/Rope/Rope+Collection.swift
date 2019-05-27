@@ -1,14 +1,11 @@
 extension Rope: Collection {
     var startIndex: Int { return 0 }
     var endIndex: Int {
-        switch self {
-        case let .leaf(contents): return contents.count
-        case let .node(_, r): return weight + (r?.endIndex ?? 0)
-        }
+        return fold({ ($0 ?? 0) + ($1 ?? 0) }, { $0.count })
     }
     
     func index(after i: Int) -> Int {
-        precondition(i < self.weight, "Index out of bounds")
+        precondition(i < endIndex, "Index out of bounds")
         return i + 1
     }
 }
