@@ -22,10 +22,19 @@ extension Rope {
     
     fileprivate func getLeaves<T>(_ rope: Rope<T>?) -> [Rope<T>] {
         guard let rope = rope else { return [] }
-        switch rope {
-        case let .node(l, r): return [l, r].flatMap(getLeaves)
-        case .leaf: return [rope]
+        var stack: [Rope<T>] = []
+        var r: [Rope<T>] = []
+        stack.append(rope)
+        while true {
+            guard let next = stack.popLast() else { break }
+            switch next {
+            case let .node(l, r, _, _):
+                if let right = r { stack.append(right)}
+                if let left = l { stack.append(left) }
+            case .leaf: r.append(next)
+            }
         }
+        return r
     }
     
     fileprivate func splitLeaf<T>(_ minLeafSize: Int, _ maxLeafSize: Int) -> (Rope<T>) -> [Rope<T>] {
@@ -43,9 +52,11 @@ extension Rope {
     fileprivate func splitContents<T>(_ minLeafSize: Int, _ maxLeafSize: Int) -> ([T]) -> [Rope<T>] {
         return { contents in
             return stride(from: 0, to: contents.count, by: maxLeafSize)
-                .map { Range(uncheckedBounds: ($0, Swift.min($0 + maxLeafSize, contents.count))) }
-                .map { Array(contents[$0.startIndex..<$0.endIndex]) }
-                .map { Rope<T>.leaf(contents: $0) }
+                .map { idx in
+                    let r = Range(uncheckedBounds: (idx, Swift.min(idx + maxLeafSize, contents.count)))
+                    let a = Array(contents[r.startIndex..<r.endIndex])
+                    return Rope<T>.leaf(contents: a)
+                }
         }
     }
     
@@ -80,12 +91,12 @@ extension Rope {
         guard let rope = rope else { return head }
         
         switch head {
-        case let .node(l, r):
+        case let .node(l, r, _, _):
             if let newLeft = appendRopeWithoutChangingHeight(l, rope) {
-                return .node(l: newLeft, r: r)
+                return Rope<T>(l: newLeft, r: r)
             }
             if let newRight = appendRopeWithoutChangingHeight(r, rope) {
-                return .node(l: l, r: newRight)
+                return Rope<T>(l: l, r: newRight)
             }
             return nil
         case .leaf: return nil
@@ -101,13 +112,13 @@ extension Rope {
         }
         
         balancedRopes[depth] = nil
-        let next = appendRopeWithoutChangingHeight(extantRope, rope) ?? .node(l: extantRope, r: rope)
+        let next = appendRopeWithoutChangingHeight(extantRope, rope) ?? Rope<T>(l: extantRope, r: rope)
         return insertRopeIntoBalancer(partial: balancedRopes, rope: next)
     }
     
     fileprivate func appendRopes<T>(partial: Rope<T>?, rope: Rope<T>) -> Rope<T> {
         guard let partial = partial else { return rope }
-        return .node(l: rope, r: partial)
+        return Rope<T>(l: rope, r: partial)
     }
 }
 

@@ -23,21 +23,27 @@ final class RopeTests: XCTestCase {
     }
     
     func testHeight() {
-        let r1: Rope<Int> = .node(l: .leaf(contents: [0]), r: .leaf(contents: [1]))
+        let r0: Rope<Int> = .node(l: nil, r: nil, height: Rope<Int>.computeHeight(l: nil as Rope<Int>?, r: nil as Rope<Int>?), weight: 0)
+        XCTAssertEqual(r0.height, 0)
+        let r1: Rope<Int> = Rope(l: .leaf(contents: [0]), r: .leaf(contents: [1]))
         XCTAssertEqual(r1.height, 1)
-        let r2: Rope<Int> = .node(l: .node(l: .leaf(contents: [0]), r: .leaf(contents: [1])), r: nil)
+        let r1_1: Rope<Int> = Rope(l: nil, r: .leaf(contents: [1]))
+        XCTAssertEqual(r1_1.height, 1)
+        let r1_2: Rope<Int> = Rope(l: .leaf(contents: [1]), r: nil)
+        XCTAssertEqual(r1_2.height, 1)
+        let r2: Rope<Int> = Rope(l: Rope(l: .leaf(contents: [0]), r: .leaf(contents: [1])), r: nil)
         XCTAssertEqual(r2.height, 2)
-        let r3: Rope<Int> = .node(
-            l: .node(
-                l: .node(
-                    l: .node(
+        let r3: Rope<Int> = Rope(
+            l: Rope(
+                l: Rope(
+                    l: Rope(
                         l: .leaf(contents: [0]),
                         r: .leaf(contents: [1])),
                     r: nil),
                 r: nil),
             r: nil)
         XCTAssertEqual(r3.height, 4)
-        let r4: Rope<Int> = .node(l: nil, r: .node(l: nil, r: .leaf(contents: [0])))
+        let r4: Rope<Int> = Rope(l: nil, r: Rope(l: nil, r: .leaf(contents: [0])))
         XCTAssertEqual(r4.height, 2)
     }
     
@@ -96,7 +102,7 @@ final class RopeTests: XCTestCase {
     }
     
     func testSplitNilLeft() {
-        let rope: Rope<Int> = .node(l: .node(l: nil, r: .leaf(contents: [0])), r: .leaf(contents: [1]))
+        let rope: Rope<Int> = Rope(l: Rope(l: nil, r: .leaf(contents: [0])), r: .leaf(contents: [1]))
         let (a, b) = rope.split(at: 1)
         XCTAssertNotNil(a)
         XCTAssertNotNil(b)

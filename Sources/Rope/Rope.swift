@@ -7,39 +7,51 @@
 
 indirect enum Rope<Element> {
     case leaf(contents: [Element])
-    case node(l: Rope<Element>?, r: Rope<Element>?)
+    case node(l: Rope<Element>?, r: Rope<Element>?, height: Int, weight: Int)
     
-    var sumOfLeaves: Int {
-        return fold( { ($0 ?? 0) + ($1 ?? 0) }, { $0.count })
+    internal var sumOfLeaves: Int {
+        switch self {
+        case .leaf(let contents): return contents.count
+        case let .node(_, r, _, weight): return weight + (r?.sumOfLeaves ?? 0)
+        }
     }
 
     var weight: Int {
         switch self {
-        case .leaf(let value): return value.count
-        case let .node(l, _): return l?.sumOfLeaves ?? 0
+        case .leaf(let contents): return contents.count
+        case let .node(_, _, _, weight): return weight
         }
     }
     
     var height: Int {
-        return fold({ Swift.max($0 ?? 0, $1 ?? 0) + 1 }, { _ in return 0 })
+        switch self {
+        case .leaf: return 0
+        case let .node(_, _, height, _): return height
+        }
     }
         
     init() {
-        self = .node(l: nil, r: nil)
+        self = .node(l: nil, r: nil, height: 0, weight: 0)
     }
     
     init(_ elements: [Element]) {
-        self = .node(l: .leaf(contents: elements), r: nil)
+        self = Rope(l: .leaf(contents: elements), r: nil)
     }
     
-    init?(l: Rope<Element>?, r: Rope<Element>?) {
-        if l != nil || r != nil { self = .node(l: l, r: r) }
-        else { return nil }
+    init(l: Rope<Element>?, r: Rope<Element>?) {
+        self = .node(l: l, r: r, height: Rope.computeHeight(l: l, r: r), weight: l?.sumOfLeaves ?? 0)
+    }
+    
+    internal static func computeHeight<T>(l: Rope<T>?, r: Rope<T>?) -> Int {
+        guard l != nil || r != nil else { return 0 }
+        let lh = l?.height ?? 0
+        let rh = r?.height ?? 0
+        return Swift.max(lh, rh) + 1
     }
     
     func fold<Result>(_ nodeCase: (Result?, Result?) throws -> Result, _ leafCase: ([Element]) throws -> Result) rethrows -> Result {
         switch self {
-        case let .node(l, r): return try nodeCase(l?.fold(nodeCase, leafCase), r?.fold(nodeCase, leafCase))
+        case let .node(l, r, _, _): return try nodeCase(l?.fold(nodeCase, leafCase), r?.fold(nodeCase, leafCase))
         case let .leaf(contents): return try leafCase(contents)
         }
     }
@@ -48,15 +60,16 @@ indirect enum Rope<Element> {
         guard newSubRope != nil else { return self }
         switch self {
         case .leaf:
-            return .node(l: self, r: newSubRope)
-        case let .node(l, r):
+            return Rope(l: self, r: newSubRope)
+        case let .node(l, r, _, _):
             guard let left = l else {
-                return .node(l: newSubRope, r: r)
+                return Rope(l: newSubRope, r: r)
             }
             guard let right = r else {
-                return .node(l: left, r: newSubRope)
+                return Rope(l: left, r: newSubRope)
             }
-            return .node(l: left, r: right.appendRope(newSubRope))
+            let newRight = right.appendRope(newSubRope)
+            return Rope(l: left, r: newRight)
         }
     }
     
@@ -64,17 +77,17 @@ indirect enum Rope<Element> {
         guard newSubRope != nil else { return self }
         switch self {
         case .leaf:
-            return Rope<Element>.node(l: newSubRope, r: self)
-        case let .node(l, r):
-            return Rope<Element>.node(l: l?.prependRope(newSubRope), r: r)
+            return Rope(l: newSubRope, r: self)
+        case let .node(l, r, _, _):
+            return Rope(l: l?.prependRope(newSubRope), r: r)
         }
     }
     
     // Split this rope into two unbalanced ropes.
     func split(at splitIndex: Int) -> (a: Rope<Element>?, b: Rope<Element>?) {
         switch self {
-        case let .node(l, r):
-            if splitIndex <= weight {
+        case let .node(l, r, _, weight):
+            if splitIndex < weight {
                 let (a, b) = l?.split(at: splitIndex) ?? (nil, nil)
                 if let r = r {
                     return (a, r.prependRope(b))
@@ -107,7 +120,7 @@ extension Rope: CustomStringConvertible {
     var contentDescription: String {
         switch self {
         case .leaf(let v): return v.description
-        case let .node(l, r): return (l?.contentDescription ?? "") + (r?.contentDescription ?? "")
+        case let .node(l, r, _, _): return (l?.contentDescription ?? "") + (r?.contentDescription ?? "")
         }
     }
 }

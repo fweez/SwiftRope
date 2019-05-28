@@ -13,7 +13,8 @@ class PerformanceTests: XCTestCase {
         measure {
             var rope: Rope<Int> = [0]
             for i in 0..<1000 {
-                let idx = Int(arc4random_uniform(UInt32(rope.count)))
+                let limit = max(0, rope.count - 1)
+                let idx = Int(arc4random_uniform(UInt32(limit)))
                 rope.replaceSubrange(idx..<idx+1, with: [1, 2, 3, 4])
                 if i % 100 == 0 { rope = rope.balanced(minLeafSize: 0, maxLeafSize: Int.max)! }
             }

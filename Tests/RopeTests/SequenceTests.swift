@@ -17,7 +17,20 @@ class SequenceTests: XCTestCase {
     }
     
     fileprivate var complexTenElementRope: Rope<Int> {
-        return Rope<Int>.node(l: .node(l: .leaf(contents: [0, 1, 2]), r: .node(l: nil, r: .leaf(contents: [3, 4]))), r: .node(l: .leaf(contents: [5, 6, 7]), r: .node(l: .leaf(contents: [8, 9]), r: nil)))
+        return Rope(
+            l: Rope(
+                l: .leaf(contents: [0, 1, 2]),
+                r: Rope(
+                    l: nil,
+                    r: .leaf(contents: [3, 4])
+                    )
+                ),
+            r: Rope(
+                l: .leaf(contents: [5, 6, 7]),
+                r: Rope(l: .leaf(contents: [8, 9]),
+                        r: nil)
+                )
+            )
     }
     
     func testMap() {

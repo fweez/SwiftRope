@@ -11,7 +11,7 @@ extension Rope: Sequence {
                 case let .leaf(contents):
                     if contents.count > 0 { leafStack.append(contentsOf: contents) }
                     if leafStack.count > 0 { return leafStack.removeFirst() }
-                case let .node(l, r):
+                case let .node(l, r, _, _):
                     if let r = r { nodeStack.append(r) }
                     if let l = l { nodeStack.append(l) }
                 }
@@ -21,21 +21,23 @@ extension Rope: Sequence {
     }
 
     func reversed() -> Rope {
-        return fold({ .node(l: $1, r: $0) }, { .leaf(contents: Array($0.reversed())) }) 
+        return fold({ Rope(l: $1, r: $0) }, { .leaf(contents: Array($0.reversed())) })
     }
     
     func map<T>(_ transform: (Element) throws -> T) rethrows -> Rope<T> {
-        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.map(transform)) }) 
+        return try fold({ Rope<T>(l: $0, r: $1) },
+                        { .leaf(contents: try $0.map(transform)) })
     }
     
-    func compactMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> Rope<ElementOfResult> {
-        return try fold({ .node(l: $0, r: $1) }, { .leaf(contents: try $0.compactMap(transform)) })
+    func compactMap<T>(_ transform: (Element) throws -> T?) rethrows -> Rope<T> {
+        return try fold({ Rope<T>(l: $0, r: $1) },
+                        { .leaf(contents: try $0.compactMap(transform)) })
     }
     
     func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
         switch self {
         case let .leaf(contents): return try contents.reduce(initialResult, nextPartialResult)
-        case let .node(l, r):
+        case let .node(l, r, _, _):
             let leftPartial = try l?.reduce(initialResult, nextPartialResult) ?? initialResult
             return try r?.reduce(leftPartial, nextPartialResult) ?? leftPartial
         }

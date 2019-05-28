@@ -20,7 +20,7 @@ extension Rope: BidirectionalCollection {
     var last: Element? {
         switch self {
         case .leaf(let contents): return contents.last
-        case let .node(l, r):
+        case let .node(l, r, _, _):
             if let result = r?.last { return result }
             return l?.last
         }
@@ -32,7 +32,7 @@ extension Rope: MutableCollection {
         get {
             switch self {
             case .leaf(let contents): return contents[position]
-            case let .node(l, r):
+            case let .node(l, r, _, weight):
                 if weight <= position {
                     precondition(r != nil, "Index out of bounds")
                     return r![position - weight]
@@ -49,13 +49,15 @@ extension Rope: MutableCollection {
     
     private func set(value: Element, at position: Int) -> Rope<Element> {
         switch self {
-        case let .node(l, r):
+        case let .node(l, r, _, weight):
             if weight <= position {
                 precondition(r != nil, "Index out of bounds")
-                return .node(l: l, r: r!.set(value: value, at: position - weight))
+                let newRight = r!.set(value: value, at: position - weight)
+                return Rope(l: l, r: newRight)
             } else {
                 precondition(l != nil, "Index out of bounds")
-                return .node(l: l!.set(value: value, at: position), r: r)
+                let newLeft = l!.set(value: value, at: position)
+                return Rope(l: newLeft, r: r)
             }
         case .leaf(var contents):
             contents[position] = value
@@ -76,15 +78,18 @@ extension Rope: RangeReplaceableCollection {
         case .leaf:
             assertionFailure("Could not insert")
             return .leaf(contents: [])
-        case .node(let l, var r):
+        case .node(let l, var r, _, let weight):
+            let newRight: Rope<Element>
             switch r {
             case .none:
-                return .node(l: l, r: .leaf(contents: newElements))
+                newRight = .leaf(contents: newElements)
             case .some(.leaf):
-                return .node(l: l, r: .node(l: r, r: .leaf(contents: newElements)))
+                let newLeaf: Rope<Element> = .leaf(contents: newElements)
+                newRight = Rope(l: r, r: newLeaf)
             case .some(.node):
-                return .node(l: l, r: r!.rewritingAppend(contentsOf: newElements))
+                newRight = r!.rewritingAppend(contentsOf: newElements)
             }
+            return Rope(l: l, r: newRight)
         }
     }
     
@@ -104,12 +109,13 @@ extension Rope: RangeReplaceableCollection {
         // then insert the newElements between the first and last rope
         // if the first rope is empty, newElements should be first:
         guard var first = a else {
-            self = .node(l: .leaf(contents: Array(newElements)), r: third)
+            let newLeft: Rope<Element> = .leaf(contents: Array(newElements))
+            self = Rope(l: newLeft, r: third)
             return
         }
         
         switch first {
-        case .leaf: first = .node(l: first, r: nil)
+        case .leaf: first = .node(l: first, r: nil, height: Rope.computeHeight(l: first, r: nil), weight: first.sumOfLeaves)
         case .node: break
         }
         self = first.appendRope(.leaf(contents: Array(newElements))).appendRope(third)

@@ -10,7 +10,7 @@ import XCTest
 
 class RebalanceTests: XCTestCase {
     func testRebalanceLongLeft() {
-        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
+        let rope = Rope(l: Rope(l: Rope(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
         guard let balanced = rope.balanced( minLeafSize: 0, maxLeafSize: Int.max) else {
             XCTFail()
             return
@@ -18,7 +18,7 @@ class RebalanceTests: XCTestCase {
         XCTAssertEqual(Array(balanced), [1, 2])
     }
     func testRebalanceLongRight() {
-        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
+        let rope = Rope(l: Rope(l: Rope(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
         guard let balanced = rope.balanced( minLeafSize: 0, maxLeafSize: Int.max) else {
             XCTFail()
             return
@@ -27,7 +27,7 @@ class RebalanceTests: XCTestCase {
     }
     
     func testRebalanceMinLeafSize() {
-        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
+        let rope = Rope(l: Rope(l: Rope(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
         guard let balanced = rope.balanced( minLeafSize: 2, maxLeafSize: Int.max) else {
             XCTFail()
             return
@@ -38,7 +38,7 @@ class RebalanceTests: XCTestCase {
     }
     
     func testRebalanceMinLeafSizeBelowArraySize() {
-        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: .leaf(contents: [2])), r: .leaf(contents: [3]))
+        let rope = Rope(l: Rope(l: Rope(l: .leaf(contents: [1]), r: nil), r: .leaf(contents: [2])), r: .leaf(contents: [3]))
         guard let balanced = rope.balanced( minLeafSize: 2, maxLeafSize: Int.max) else {
             XCTFail()
             return
@@ -49,7 +49,7 @@ class RebalanceTests: XCTestCase {
     }
     
     func testRebalanceMinLeafSizeBelowContents() {
-        let rope = Rope.node(l: .node(l: .node(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
+        let rope = Rope(l: Rope(l: Rope(l: .leaf(contents: [1]), r: nil), r: nil), r: .leaf(contents: [2]))
         guard let balanced = rope.balanced( minLeafSize: 3, maxLeafSize: Int.max) else {
             XCTFail()
             return
