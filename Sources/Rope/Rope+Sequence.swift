@@ -1,5 +1,5 @@
 extension Rope: Sequence {
-    func makeIterator() -> AnyIterator<Element> {
+    public func makeIterator() -> AnyIterator<Element> {
         var nodeStack: [Rope] = [self]
         var leafStack: [Element] = []
         return AnyIterator {
@@ -20,21 +20,21 @@ extension Rope: Sequence {
         }
     }
 
-    func reversed() -> Rope {
+    public func reversed() -> Rope {
         return fold({ Rope(l: $1, r: $0) }, { .leaf(contents: Array($0.reversed())) })
     }
     
-    func map<T>(_ transform: (Element) throws -> T) rethrows -> Rope<T> {
+    public func map<T>(_ transform: (Element) throws -> T) rethrows -> Rope<T> {
         return try fold({ Rope<T>(l: $0, r: $1) },
                         { .leaf(contents: try $0.map(transform)) })
     }
     
-    func compactMap<T>(_ transform: (Element) throws -> T?) rethrows -> Rope<T> {
+    public func compactMap<T>(_ transform: (Element) throws -> T?) rethrows -> Rope<T> {
         return try fold({ Rope<T>(l: $0, r: $1) },
                         { .leaf(contents: try $0.compactMap(transform)) })
     }
     
-    func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+    public func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
         switch self {
         case let .leaf(contents): return try contents.reduce(initialResult, nextPartialResult)
         case let .node(l, r, _, _):
@@ -43,7 +43,7 @@ extension Rope: Sequence {
         }
     }
     
-    func prefix(_ maxLength: Int) -> Slice<Rope<Element>> {
+    public func prefix(_ maxLength: Int) -> Slice<Rope<Element>> {
         guard maxLength > 0 else { return Slice(Rope([])) }
         guard maxLength <= count else { return Slice(self) }
         let splitPosition = Swift.min(maxLength, count)
@@ -51,7 +51,7 @@ extension Rope: Sequence {
         return Slice(prefixRope!)
     }
     
-    func suffix(_ maxLength: Int) -> Slice<Rope<Element>> {
+    public func suffix(_ maxLength: Int) -> Slice<Rope<Element>> {
         guard maxLength > 0 else { return Slice(Rope([])) }
         guard maxLength <= count else { return Slice(self) }
         let splitPosition = Swift.max(0, count - maxLength)

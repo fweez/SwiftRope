@@ -6,7 +6,7 @@
 //
 
 extension Rope {
-    func balanced(minLeafSize: Int, maxLeafSize: Int) -> Rope? {
+    public func balanced(minLeafSize: Int, maxLeafSize: Int) -> Rope? {
         return balance(self, minLeafSize: minLeafSize, maxLeafSize: maxLeafSize)
     }
     

@@ -1,6 +1,10 @@
-@testable import Rope
+import Rope
 
+var intRope = Rope([1, 2, 3])
+intRope.append(4)
+(4..<100).forEach { i in intRope.append(i) }
+print(intRope.height)
+var balancedRope = intRope.balanced(minLeafSize: 5, maxLeafSize: 10)!
+print(balancedRope.height)
 
-var r1: Rope<Int> = .node(l: .node(l: .leaf(contents: [1]), r: .leaf(contents: [2])), r: .node(l: .leaf(contents: [3]), r: .leaf(contents: [99])))
-var r2: Rope<Int> = .leaf(contents: [4])
-appendRopeWithoutChangingHeight(r1, r2)
+intRope.reduce(0, +)

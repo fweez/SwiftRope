@@ -5,7 +5,7 @@
 //  Created by Ryan Forsythe on 4/26/19.
 //
 
-indirect enum Rope<Element> {
+public indirect enum Rope<Element> {
     case leaf(contents: [Element])
     case node(l: Rope<Element>?, r: Rope<Element>?, height: Int, weight: Int)
     
@@ -23,22 +23,22 @@ indirect enum Rope<Element> {
         }
     }
     
-    var height: Int {
+    public var height: Int {
         switch self {
         case .leaf: return 0
         case let .node(_, _, height, _): return height
         }
     }
         
-    init() {
+    public init() {
         self = .node(l: nil, r: nil, height: 0, weight: 0)
     }
     
-    init(_ elements: [Element]) {
+    public init(_ elements: [Element]) {
         self = Rope(l: .leaf(contents: elements), r: nil)
     }
     
-    init(l: Rope<Element>?, r: Rope<Element>?) {
+    public init(l: Rope<Element>?, r: Rope<Element>?) {
         self = .node(l: l, r: r, height: Rope.computeHeight(l: l, r: r), weight: l?.sumOfLeaves ?? 0)
     }
     
@@ -113,7 +113,7 @@ indirect enum Rope<Element> {
 }
 
 extension Rope: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         return "Height: \(height); contents: \(contentDescription)"
     }
     
@@ -126,9 +126,9 @@ extension Rope: CustomStringConvertible {
 }
 
 extension Rope: ExpressibleByArrayLiteral {
-    typealias ArrayLiteralElement = Element
+    public typealias ArrayLiteralElement = Element
     
-    init(arrayLiteral elements: Rope.ArrayLiteralElement...) {
+    public init(arrayLiteral elements: Rope.ArrayLiteralElement...) {
         self.init(elements)
     }
 }

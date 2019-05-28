@@ -1,23 +1,23 @@
 extension Rope: Collection {
-    var startIndex: Int { return 0 }
-    var endIndex: Int {
+    public var startIndex: Int { return 0 }
+    public var endIndex: Int {
         return fold({ ($0 ?? 0) + ($1 ?? 0) }, { $0.count })
     }
     
-    func index(after i: Int) -> Int {
+    public func index(after i: Int) -> Int {
         precondition(i < endIndex, "Index out of bounds")
         return i + 1
     }
 }
 
 extension Rope: BidirectionalCollection {
-    func index(before i: Int) -> Int {
+    public func index(before i: Int) -> Int {
         precondition(i > 0, "Index out of bounds")
         precondition(i <= endIndex, "Index out of bounds")
         return i - 1
     }
     
-    var last: Element? {
+    public var last: Element? {
         switch self {
         case .leaf(let contents): return contents.last
         case let .node(l, r, _, _):
@@ -28,7 +28,7 @@ extension Rope: BidirectionalCollection {
 }
 
 extension Rope: MutableCollection {
-    subscript(position: Int) -> Element {
+    public subscript(position: Int) -> Element {
         get {
             switch self {
             case .leaf(let contents): return contents[position]
@@ -68,8 +68,8 @@ extension Rope: MutableCollection {
 
 extension Rope: RandomAccessCollection { }
 
-extension Rope: RangeReplaceableCollection {
-    mutating func append(contentsOf newElements: [Element]) {
+extension Rope: RangeReplaceableCollection {    
+    public mutating func append(contentsOf newElements: [Element]) {
         self = rewritingAppend(contentsOf: newElements)
     }
     
@@ -78,7 +78,7 @@ extension Rope: RangeReplaceableCollection {
         case .leaf:
             assertionFailure("Could not insert")
             return .leaf(contents: [])
-        case .node(let l, var r, _, let weight):
+        case .node(let l, var r, _, _):
             let newRight: Rope<Element>
             switch r {
             case .none:
@@ -93,11 +93,11 @@ extension Rope: RangeReplaceableCollection {
         }
     }
     
-    mutating func append(_ e: Element) {
+    mutating public func append(_ e: Element) {
         append(contentsOf: [e])
     }
     
-    mutating func replaceSubrange<C>(_ subrange: Range<Rope.Index>, with newElements: __owned C) where C : Collection, Rope.Element == C.Element {
+    mutating public func replaceSubrange<C>(_ subrange: Range<Rope.Index>, with newElements: __owned C) where C : Collection, Rope.Element == C.Element {
         // The basic idea is we split our rope into three ropes:
         // rope.start..<subrange.start, subrange.start...subrange.end, subrange.end+1..rope.end
         // then discard the middle rope
