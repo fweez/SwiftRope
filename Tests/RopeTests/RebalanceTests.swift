@@ -126,4 +126,31 @@ class RebalanceTests: XCTestCase {
         let expectedHeight = Int(ceil(log2(Float(nodes))))
         XCTAssertEqual(balanced.height, expectedHeight)
     }
+    
+    func testAppendWithoutChangingHeightNilRight() {
+        let rope = Rope(l: Rope(l: .leaf(contents: [0]), r: nil), r: nil)
+        let append: Rope<Int> = .leaf(contents: [1])
+        let result = rope.appendRopeWithoutChangingHeight(rope, append)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(Array(result!), [0, 1])
+    }
+    
+    func testAWCHFailsInNilRight() {
+        let rope = Rope(l: .leaf(contents: [0]), r: nil)
+        let append = Rope(l: Rope(l: .leaf(contents: [1]), r: .leaf(contents: [2])), r: nil)
+        XCTAssertNil(rope.appendRopeWithoutChangingHeight(rope, append))
+    }
+    
+    func testAWCHNonNilRight() {
+        let rope = Rope(l: Rope(l: .leaf(contents: [0]), r: nil), r: Rope(l: .leaf(contents: [1]), r: nil))
+        let append: Rope<Int> = .leaf(contents: [2])
+        let result = rope.appendRopeWithoutChangingHeight(rope, append)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(Array(result!), [0, 1, 2])
+    }
+    
+    func testAWCHNilLeft() {
+        let rope = Rope(l: nil, r: .leaf(contents: [0]))
+        XCTAssertNil(rope.appendRopeWithoutChangingHeight(rope, .leaf(contents: [1])))
+    }
 }

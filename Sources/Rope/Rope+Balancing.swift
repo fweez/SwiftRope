@@ -86,7 +86,7 @@ extension Rope {
         }
     }
     
-    fileprivate func appendRopeWithoutChangingHeight<T>(_ head: Rope<T>?, _ rope: Rope<T>?) -> Rope<T>? {
+    internal func appendRopeWithoutChangingHeight<T>(_ head: Rope<T>?, _ rope: Rope<T>?) -> Rope<T>? {
         guard let head = head, let rope = rope else {
             assertionFailure()
             return nil
@@ -94,13 +94,12 @@ extension Rope {
         
         switch head {
         case let .node(l, r, _, _):
-            if let newLeft = appendRopeWithoutChangingHeight(l, rope) {
-                return Rope<T>(l: newLeft, r: r)
+            let new = r?.appendRope(rope) ?? rope
+            if new.height <= (l?.height ?? 0) && new.height <= (r?.height ?? 0) {
+                return Rope<T>(l: l, r: new)
+            } else {
+                return nil
             }
-            if let newRight = appendRopeWithoutChangingHeight(r, rope) {
-                return Rope<T>(l: l, r: newRight)
-            }
-            return nil
         case .leaf: return nil
         }
     }
