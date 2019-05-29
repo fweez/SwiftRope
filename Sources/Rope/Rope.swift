@@ -99,7 +99,7 @@ public indirect enum Rope<Element> {
                 if let l = l {
                     return (l.appendRope(a), b)
                 } else {
-                    return (Rope(l: nil, r: a), b)
+                    return (a, b)
                 }
             }
         case let .leaf(contents):

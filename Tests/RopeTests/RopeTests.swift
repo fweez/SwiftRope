@@ -108,5 +108,9 @@ final class RopeTests: XCTestCase {
         XCTAssertNotNil(b)
         XCTAssertEqual(a![0], 0)
         XCTAssertEqual(b![0], 1)
+        let (c, d) = rope.split(at: 0)
+        XCTAssertNil(c)
+        XCTAssertNotNil(d)
+        XCTAssert(Array(d!) == [0, 1])
     }
 }
