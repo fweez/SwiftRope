@@ -9,6 +9,18 @@ class CollectionTests: XCTestCase {
         XCTAssert(r[0] == 1, "Rope \(r) had an incorrect element")
     }
     
+    func testLargerSet() {
+        var r = Rope(Array(0..<2))
+        r.append(contentsOf: Array(2..<4))
+        r.append(contentsOf: Array(4..<6))
+        r.append(contentsOf: Array(6..<8))
+        r = r.balanced(minLeafSize: 0, maxLeafSize: Int.max)!
+        r[3] = 99
+        var a = Array(0..<8)
+        a[3] = 99
+        XCTAssertEqual(Array(r), a)
+    }
+    
     func testAppendElement() {
         var r = Rope([0, 1, 2])
         r.append(3)
@@ -77,11 +89,33 @@ class CollectionTests: XCTestCase {
         XCTAssertEqual(Array(r), a)
     }
     
+    func testReplaceSubrangeInLargerTree() {
+        var r = Rope(Array(0..<2))
+        r.append(contentsOf: Array(2..<4))
+        r.append(contentsOf: Array(4..<6))
+        r.append(contentsOf: Array(6..<8))
+        r = r.balanced(minLeafSize: 0, maxLeafSize: Int.max)!
+        let replaceRange = 3..<4
+        let replaceSequence = [99]
+        r.replaceSubrange(replaceRange, with: replaceSequence)
+        var a = Array(0..<8)
+        a.replaceSubrange(replaceRange, with: replaceSequence)
+        XCTAssertEqual(Array(r), a)
+    }
+    
     func testReplaceLastElement() {
         var r = Rope(Array(0..<10))
         var a = Array(0..<10)
         r.replaceSubrange(9..<10, with: [99])
         a.replaceSubrange(9..<10, with: [99])
         XCTAssertEqual(Array(r), a)
+    }
+    
+    func testIndexes() {
+        let r = Rope(Array(0..<10))
+        XCTAssertEqual(r.startIndex, 0)
+        XCTAssertEqual(r.endIndex, 10)
+        (0..<10).forEach { XCTAssertEqual(r.index(after: $0), $0 + 1) }
+        (1..<9).forEach { XCTAssertEqual(r.index(before: $0), $0 - 1) }
     }
 }
